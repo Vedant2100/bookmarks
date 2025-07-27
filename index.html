@@ -182,7 +182,7 @@
 </head>
 <body>
     <div class="container">
-        <div class="grid-container" id="bookmarkGrid">
+        <div class="grid-container">
 
             <div class="bookmark">
                 <a href="https://chatgpt.com">
@@ -329,101 +329,5 @@
         
         </div>
     </div>
-    <script>
-    // --- Drag and Drop for Bookmarks ---
-    const grid = document.getElementById('bookmarkGrid');
-    let draggedItem = null;
-    let dragStartIndex = null;
-
-    // Make all bookmarks draggable
-    function makeBookmarksDraggable() {
-        const bookmarks = grid.querySelectorAll('.bookmark');
-        bookmarks.forEach((bookmark, idx) => {
-            bookmark.setAttribute('draggable', 'true');
-            bookmark.setAttribute('data-index', idx);
-
-            bookmark.addEventListener('dragstart', (e) => {
-                draggedItem = bookmark;
-                dragStartIndex = idx;
-                e.dataTransfer.effectAllowed = 'move';
-                setTimeout(() => bookmark.classList.add('dragging'), 0);
-            });
-
-            bookmark.addEventListener('dragend', () => {
-                draggedItem = null;
-                dragStartIndex = null;
-                bookmark.classList.remove('dragging');
-            });
-
-            bookmark.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-            });
-
-            bookmark.addEventListener('dragenter', (e) => {
-                e.preventDefault();
-                bookmark.classList.add('drag-over');
-            });
-
-            bookmark.addEventListener('dragleave', () => {
-                bookmark.classList.remove('drag-over');
-            });
-
-            bookmark.addEventListener('drop', (e) => {
-                e.preventDefault();
-                bookmark.classList.remove('drag-over');
-                if (draggedItem && draggedItem !== bookmark) {
-                    // Swap the dragged and target bookmarks
-                    const all = Array.from(grid.children);
-                    const from = all.indexOf(draggedItem);
-                    const to = all.indexOf(bookmark);
-                    if (from > -1 && to > -1) {
-                        if (from < to) {
-                            grid.insertBefore(draggedItem, bookmark.nextSibling);
-                        } else {
-                            grid.insertBefore(draggedItem, bookmark);
-                        }
-                        saveOrder();
-                        makeBookmarksDraggable(); // Re-apply listeners
-                    }
-                }
-            });
-        });
-    }
-
-    // Save order to localStorage
-    function saveOrder() {
-        const order = Array.from(grid.children).map(bm => bm.innerHTML);
-        localStorage.setItem('bookmarkOrder', JSON.stringify(order));
-    }
-
-    // Load order from localStorage
-    function loadOrder() {
-        const order = JSON.parse(localStorage.getItem('bookmarkOrder') || 'null');
-        if (order) {
-            grid.innerHTML = '';
-            order.forEach(html => {
-                const div = document.createElement('div');
-                div.className = 'bookmark';
-                div.innerHTML = html;
-                grid.appendChild(div);
-            });
-        }
-    }
-
-    // Add some drag styles
-    const style = document.createElement('style');
-    style.textContent = `
-        .bookmark.dragging { opacity: 0.4; }
-        .bookmark.drag-over { outline: 2px dashed #fff; }
-    `;
-    document.head.appendChild(style);
-
-    // Initialize
-    loadOrder();
-    makeBookmarksDraggable();
-    // Re-apply listeners after any DOM change
-    grid.addEventListener('DOMNodeInserted', makeBookmarksDraggable);
-    </script>
 </body>
 </html>
