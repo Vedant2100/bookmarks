@@ -329,5 +329,25 @@
         
         </div>
     </div>
+    <button id="addTodo">Add Todoist Task</button>
+
+    <script>
+    document.getElementById("addTodo").addEventListener("click", async () => {
+        const taskData = {
+            content: "Example task from my Netlify HTML",
+            due_string: "tomorrow 12:00",
+            priority: 4
+        };
+
+        const res = await fetch("/.netlify/functions/addTodoistTask", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(taskData)
+        });
+
+        const data = await res.json();
+        alert("Task created: " + data.content);
+    });
+    </script>
 </body>
 </html>
