@@ -329,25 +329,49 @@
         
         </div>
     </div>
+    <input type="text" id="taskContent" placeholder="Enter task content" style="width: 300px; margin-bottom: 10px;">
+    <br>
     <button id="addTodo">Add Todoist Task</button>
-
+    
     <script>
-    document.getElementById("addTodo").addEventListener("click", async () => {
-        const taskData = {
-            content: "Example task from my Netlify HTML",
-            due_string: "tomorrow 12:00",
-            priority: 4
-        };
-
-        const res = await fetch("/.netlify/functions/addTodoistTask", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(taskData)
+        const PROJECT_ID = 2358299120; // Replace this with your actual numeric project ID
+        
+        document.getElementById("addTodo").addEventListener("click", async () => {
+            const content = document.getElementById("taskContent").value.trim();
+            if (!content) {
+                alert("Please enter a task description");
+                return;
+            }
+        
+            const taskData = {
+                content: content,
+                due_string: "tomorrow 12:00",
+                priority: 1,
+                project_id: PROJECT_ID
+            };
+        
+            console.log("Sending task:", taskData);
+        
+            try {
+                const res = await fetch("/.netlify/functions/addTodoistTask", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(taskData)
+                });
+        
+                const data = await res.json();
+        
+                if (res.ok) {
+                    alert("Task created: " + data.content);
+                } else {
+                    alert("Failed to create task: " + (data.error || JSON.stringify(data)));
+                }
+                console.log("Response:", data);
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error sending request, check console.");
+            }
         });
-
-        const data = await res.json();
-        alert("Task created: " + data.content);
-    });
     </script>
 </body>
 </html>
